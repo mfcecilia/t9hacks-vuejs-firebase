@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vue Todo</title>
+    </head>
+    <body>
+        <div id="app">
+            <input type="text" v-model="message"/>
+            
+            <!--{{message}}-->
+            
+            <!--{{todos}}-->
+            
+            <form v-on:submit.prevent="createTodo">
+                <input type="text" v-model="newTodo.description"/>
+                <button>Create Todo</button>
+            </form>
+            
+            <ul>
+                <li v-for="todo in todos">
+                    {{todo.description}} - {{todo.status}}
+                    <button v-on:click="updateTodo(todo)">Mark Closed</button>
+                    <button v-on:click="deleteTodo(todo)">Delete</button>
+                </li>
+            </ul>
+        </div>
+        
+        <script src="https://unpkg.com/vue"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+        <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
+        
+        <script>
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyASx8bDwHnbe-j6jhdl-CL6DFgntp9hI5A",
+                authDomain: "t9hacks-todo-71c3d.firebaseapp.com",
+                databaseURL: "https://t9hacks-todo-71c3d.firebaseio.com",
+            };
+            firebase.initializeApp(config);
+            
+            var todosReference = firebase.database().ref('todos');
+
+            new Vue({
+                el: "#app",
+                
+                data: {
+                    message: "Hello World!",
+                    newTodo: {
+                        description: '',
+                        status: 'Open'
+                    },
+                    //todos: ["Todo 1", "Todo 2", "Todo 3"],
+                },
+                
+                firebase: {
+                    todos: todosReference
+                },
+                
+                methods: {
+                    createTodo() {
+                        console.log("CREATING A TODO!");
+                        console.log(this.newTodo);
+                        todosReference.push(this.newTodo);
+                        this.newTodo.description = '';
+                    },
+                    
+                    updateTodo(todo) {
+                        todosReference.child(todo['.key']).update({status: "Closed"})
+                    },
+                    
+                    deleteTodo(todo) {
+                        todosReference.child(todo['.key']).remove();
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
